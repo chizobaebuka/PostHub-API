@@ -20,3 +20,17 @@
 #### Testing: Jest, Supertest
 #### Documentation: Postman Collection and Swagger
 #### Authentication: JWT
+
+Steps: 
+1. npm init -y
+2. npm install --save-dev @types/bcryptjs @types/express @types/jest @types/jsonwebtoken @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint jest nodemon ts-jest ts-node typescript @types/cors @types/compression
+3. npm install bcryptjs dotenv express joi jsonwebtoken pg pg-hstore redis sequelize compression cors
+4. initialize typescript npx tsc --init 
+5. configure sequelize - npx sequelize-cli init
+6. Create the model using - 
+    USER MODEL - npx sequelize-cli model:generate --name UserModel --attributes name:string
+    POST MODEL - npx sequelize-cli model:generate --name PostModel --attributes title:string
+    
+    After you see the generated migration and model, edit the model with the fields required and then leave the migration file in js whereas the model file is converted to ts then run the next step 
+7. npx sequelize db:migrate
+
