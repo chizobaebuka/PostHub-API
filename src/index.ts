@@ -5,6 +5,7 @@ import cors from 'cors';
 import compression from 'compression';
 import sequelize from "./db/sequelize";
 import userRouter from "./routes/userRoute";
+import commentRoute from "./routes/commentRoute";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(cors())
 app.use(compression())
 
 app.use('/v1/auth', userRouter)
+app.use('/v1/comment', commentRoute)
 
 app.get("/", (req, res) => {
     res.send("Hello World!");

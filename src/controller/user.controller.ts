@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,7 +5,6 @@ import bcrypt from 'bcryptjs';
 import UserModel from '../db/models/usermodel';
 import { loginUserSchema, signUpUserSchema } from '../utils/validators';
 import { generateToken } from '../utils/helpers';
-import { AuthRequest } from '../middleware/authMiddleware';
 
 dotenv.config();
 

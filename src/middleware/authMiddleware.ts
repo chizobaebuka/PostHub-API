@@ -6,22 +6,21 @@ export interface AuthRequest extends Request {
 }
 
 // Middleware to verify JWT token before accessing protected routes
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-    const headers = req.headers.authorization;
-    if(!headers){
-        return res.status(401).json({ message: "Token is required" });
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        res.status(401).json({ error: 'Token is required' });
+        return;
     }
 
-    const token = headers.split(" ")[1];
-    if(!token){
-        return res.status(401).json({ message: "Token is not provided" });
-    }
+    jwt.verify(token, process.env.JWT_SECRET_KEY as string, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY!)
-        req.user = decoded;
+        req.user = user as { id: string; email: string }; // Ensure the user object is typed correctly
         next();
-    } catch (err: any) {
-        return res.status(401).json({ message: "Invalid token" });
-    }
-} 
+    });
+};
