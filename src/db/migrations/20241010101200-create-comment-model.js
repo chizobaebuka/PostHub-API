@@ -5,16 +5,11 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-
-    await queryInterface.createTable('posts', {
+    await queryInterface.createTable('comments', {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
-        allowNull: false,
-      },
-      title: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
       content: {
@@ -26,6 +21,14 @@ module.exports = {
         allowNull: false,
         references: {
           model: 'users', // Reference to User model
+          key: 'id',
+        },
+      },
+      postId: { 
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: {
+          model: 'posts', // Reference to Post model
           key: 'id',
         },
       },
@@ -42,6 +45,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('posts');
+    await queryInterface.dropTable('comments');
   }
 };

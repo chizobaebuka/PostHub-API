@@ -30,7 +30,7 @@ Steps:
 6. Create the model using - 
     USER MODEL - npx sequelize-cli model:generate --name UserModel --attributes name:string
     POST MODEL - npx sequelize-cli model:generate --name PostModel --attributes title:string
-    
+    COMMENT MODEL - npx sequelize-cli model:generate --name CommentModel --attributes content:string
     After you see the generated migration and model, edit the model with the fields required and then leave the migration file in js whereas the model file is converted to ts then run the next step 
 7. npx sequelize db:migrate
 
