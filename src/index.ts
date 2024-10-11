@@ -29,21 +29,12 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-
-async function startApp() {
-    try {
-        await sequelize.authenticate();
-        console.log("Connection has been established successfully.");
-
-        await sequelize.sync().then(() => {
-            app.listen(port, () => {
-                console.log(`server is listening on http://localhost:${port}....`);
-            });
-        })
-    } catch (error: any) {
-        console.error(`Error starting server: ${error.message}`);
-        process.exit(1);
-    }
+if (process.env.NODE_ENV !== 'test') {
+    sequelize.sync().then(() => {
+        app.listen(port, () => {
+            console.log(`Server is listening on http://localhost:${port}`);
+        });
+    });
 }
 
-startApp();
+export default app;
