@@ -5,6 +5,13 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const userRouter = Router();
 
+/**
+   * @swagger
+   * tags:
+   *   name: Users
+   *   description: API endpoints to manage users
+*/
+
 userRouter.post('/signup', registerUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/', getAllUsers);

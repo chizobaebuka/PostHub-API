@@ -36,7 +36,6 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<vo
     }
 }
 
-
 export const getTopUsersWithLatestComments = async (req: Request, res: Response): Promise<void> => {
     try {
         // Step 1: Retrieve the latest comments from the database (limit to the most recent 10 comments)
