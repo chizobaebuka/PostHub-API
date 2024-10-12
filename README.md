@@ -23,8 +23,8 @@
 
 Steps: 
 1. npm init -y
-2. npm install --save-dev @types/bcryptjs @types/express @types/jest @types/jsonwebtoken @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint jest nodemon ts-jest ts-node typescript @types/cors @types/compression
-3. npm install bcryptjs dotenv express joi jsonwebtoken pg pg-hstore redis sequelize compression cors
+2. npm install --save-dev @types/bcryptjs @types/express @types/jest @types/jsonwebtoken @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint jest nodemon ts-jest ts-node typescript @types/cors @types/compression @types/swagger-jsdoc
+3. npm install bcryptjs dotenv express joi jsonwebtoken pg pg-hstore redis sequelize compression cors swagger-jsdoc swagger-ui-express
 4. initialize typescript npx tsc --init 
 5. configure sequelize - npx sequelize-cli init
 6. Create the model using - 
@@ -35,4 +35,7 @@ Steps:
 7. npx sequelize db:migrate
 8. Install jest for unit test cases - npm i -D jest ts-jest @types/jest   
 9. To run the test cases - npm run test
+10. Set up swagger documentation
+    npm i swagger-jsdoc npm i swagger-ui-express  
+    npm i --save-dev @types/swagger-ui-express
 

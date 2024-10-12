@@ -7,6 +7,8 @@ import sequelize from "./db/sequelize";
 import userRouter from "./routes/userRoute";
 import commentRoute from "./routes/commentRoute";
 import postRouter from "./routes/postRoute";
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from "./swagger";
 
 dotenv.config();
 
@@ -30,6 +32,15 @@ app.use('/v1/comment', commentRoute)
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
+
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Swagger setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 if (process.env.NODE_ENV !== 'test') {
     sequelize.sync().then(() => {
