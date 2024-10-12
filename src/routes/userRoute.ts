@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getAllUsers, getUserById, loginUser, registerUser } from '../controller/user.controller';
-import { createPost, getUserPosts } from '../controller/post.controller';
+import { createPost, getPostById, getUserPosts } from '../controller/post.controller';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const userRouter = Router();

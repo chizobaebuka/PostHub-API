@@ -6,6 +6,7 @@ import compression from 'compression';
 import sequelize from "./db/sequelize";
 import userRouter from "./routes/userRoute";
 import commentRoute from "./routes/commentRoute";
+import postRouter from "./routes/postRoute";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(cors())
 app.use(compression())
 
 app.use('/v1/auth', userRouter)
+app.use('/v1/post', postRouter)
 app.use('/v1/comment', commentRoute)
 
 app.get("/", (req, res) => {

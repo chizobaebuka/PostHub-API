@@ -34,4 +34,5 @@ Steps:
     After you see the generated migration and model, edit the model with the fields required and then leave the migration file in js whereas the model file is converted to ts then run the next step 
 7. npx sequelize db:migrate
 8. Install jest for unit test cases - npm i -D jest ts-jest @types/jest   
+9. To run the test cases - npm run test
 
