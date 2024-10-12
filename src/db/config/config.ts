@@ -1,6 +1,8 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
 
-module.exports = {
+dotenv.config();
+
+const config = {
   "development": {
     "username": process.env.DB_USER,
     "password": process.env.DB_PASSWORD,
@@ -23,3 +25,5 @@ module.exports = {
     "dialect": "postgres"
   }
 }
+
+export default config;

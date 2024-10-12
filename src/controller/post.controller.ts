@@ -34,13 +34,14 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
     }
 };
 
-export const getPostById = async (req: Request, res: Response): Promise<void>  => {
+export const getPostById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const postId = req.params.id
-        const post = await PostModel.findOne({ where: { id: postId } })
+        const postId = req.params.id;
+        const post = await PostModel.findOne({ where: { id: postId } });
 
         if (!post) {
             res.status(404).json({ message: 'Post not found' });
+            return;
         }
 
         res.status(200).json({
@@ -50,10 +51,11 @@ export const getPostById = async (req: Request, res: Response): Promise<void>  =
         });
         return;
     } catch (error: any) {
-        res.status(500).json({ message: 'Error retrieving post', error: error.errors });
+        const errorMessage = error.errors ? error.errors : 'An error occurred while retrieving the post';
+        res.status(500).json({ message: 'Error retrieving post', error: errorMessage });
         return;
     }
-}
+};
 
 export const getUserPosts = async (req: Request, res: Response): Promise<void>  => {
     try {
@@ -72,7 +74,10 @@ export const getUserPosts = async (req: Request, res: Response): Promise<void>  
         });
         return;
     } catch (error: any) {
-        res.status(500).json({ message: 'Error retrieving posts', error: error.errors });
+        res.status(500).json({
+            message: 'Error retrieving posts',
+            error: 'Database error', // Add the error field
+        });
         return;
     }
 }
