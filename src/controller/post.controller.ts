@@ -37,7 +37,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
 export const getPostById = async (req: Request, res: Response): Promise<void> => {
     try {
         const postId = req.params.id;
-        const post = await PostModel.findOne({ where: { id: postId } });
+        const post = await PostModel.findByPk(postId)
 
         if (!post) {
             res.status(404).json({ message: 'Post not found' });
@@ -49,17 +49,15 @@ export const getPostById = async (req: Request, res: Response): Promise<void> =>
             message: 'Post retrieved successfully',
             data: post,
         });
-        return;
     } catch (error: any) {
         const errorMessage = error.errors ? error.errors : 'An error occurred while retrieving the post';
         res.status(500).json({ message: 'Error retrieving post', error: errorMessage });
-        return;
     }
 };
 
 export const getUserPosts = async (req: Request, res: Response): Promise<void>  => {
     try {
-        const userId = req.params.id
+        const userId = req.params.userId
         const posts = await PostModel.findAll({ where: { userId } })
 
         if (!posts) {
@@ -81,3 +79,27 @@ export const getUserPosts = async (req: Request, res: Response): Promise<void>  
         return;
     }
 }
+
+export const getAllPosts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const posts = await PostModel.findAll();
+
+        if (!posts) {
+            res.status(404).json({ message: 'No posts found' });
+            return;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            message: 'All posts retrieved successfully',
+            data: posts,
+        });
+        return;
+    } catch (error: any) {
+        res.status(500).json({
+            message: 'Error retrieving posts',
+            error: 'Database error',
+        });
+        return;
+    }
+};

@@ -71,7 +71,478 @@ const swaggerDefinition = {
                     },
                 },
             }
-        }
+        },
+        '/v1/auth/login': {
+            post: {
+                summary: 'User login',
+                description: 'Logs in a user using their email and password',
+                tags: ['Users'],
+                parameters: [
+                    {
+                        in: 'body',
+                        name: 'user',
+                        description: 'user credentials',
+                        required: true,
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                email: {
+                                    type:'string',
+                                    description: 'The email of the user',
+                                    format: 'email',
+                                },
+                                password: {
+                                    type:'string',
+                                    description: 'The password of the user',
+                                },
+                            },
+                        },
+                    },
+                ],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                $ref: '#/components/schemas/User',
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    200: {
+                        description: 'User logged in successfully',
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                token: { type:'string' },
+                                user: { $ref: '#/components/schemas/User' },
+                            },
+                        },
+                    },
+                    400: {
+                        description: 'Bad Request',
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            },
+        },
+        '/v1/auth/': {
+            get: {
+                summary: 'Get user details',
+                description: 'Retrieves the user details for the authenticated user',
+                tags: ['Users'],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'User details retrieved successfully',
+                        schema: {
+                            $ref: '#/components/schemas/User',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            }
+        },
+        '/v1/auth/{userId}': {
+            get: {
+                summary: 'Get user details by id',
+                description: 'Retrieves the user details for the specified user',
+                tags: ['Users'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'userId',
+                        description: 'The ID of the user',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'User details retrieved successfully',
+                        schema: {
+                            $ref: '#/components/schemas/User',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    404: {
+                        description: 'User not found',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            }
+        },
+        '/v1/auth/{userId}/posts': {
+            post: {
+                summary: 'Create a new post',
+                description: 'Creates a new post for the authenticated user',
+                tags: ['Users'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'userId',
+                        description: 'The ID of the user',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                    {
+                        in: 'body',
+                        name: 'post',
+                        description: 'post details',
+                        required: true,
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                title: {
+                                    type:'string',
+                                    description: 'The title of the post',
+                                },
+                                content: {
+                                    type:'string',
+                                    description: 'The content of the post',
+                                },
+                            },
+                        },
+                    }
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    title: {
+                                        type:'string',
+                                        description: 'The title of the post',
+                                    },
+                                    content: {
+                                        type:'string',
+                                        description: 'The content of the post',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: 'Post created successfully',
+                        schema: {
+                            $ref: '#/components/schemas/Post',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                }
+            }
+        },
+        '/v1/post/create/{userId/': {
+            post: {
+                summary: 'Create a new post',
+                description: 'Creates a new post for the specified user',
+                tags: ['Posts'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'userId',
+                        description: 'The ID of the user',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                    {
+                        in: 'body',
+                        name: 'post',
+                        description: 'post details',
+                        required: true,
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                title: {
+                                    type:'string',
+                                    description: 'The title of the post',
+                                },
+                                content: {
+                                    type:'string',
+                                    description: 'The content of the post',
+                                },
+                            },
+                        },
+                    },
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    title: {
+                                        type:'string',
+                                        description: 'The title of the post',
+                                    },
+                                    content: {
+                                        type:'string',
+                                        description: 'The content of the post',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: 'Post created successfully',
+                        schema: {
+                            $ref: '#/components/schemas/Post',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            },
+        },
+        '/v1/post/users/{userId}': {
+            get: {
+                summary: 'Get post details by id',
+                description: 'Retrieves the post details for the specified user',
+                tags: ['Posts'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'userId',
+                        description: 'The ID of the user',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'Post details retrieved successfully',
+                        schema: {
+                            $ref: '#/components/schemas/Post',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    404: {
+                        description: 'Post not found',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            }
+        },
+        '/v1/post/': {
+            get: {
+                summary: 'Get all posts',
+                description: 'Retrieves all posts for the authenticated user',
+                tags: ['Posts'],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'Posts retrieved successfully',
+                        schema: {
+                            type: 'array',
+                            items: {
+                                $ref: '#/components/schemas/Post',
+                            },
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            },
+        },
+        '/v1/post/{id}': {
+            get: {
+                summary: 'Get post details by id',
+                description: 'Retrieves the post details for the specified post ID',
+                tags: ['Posts'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'id',
+                        description: 'The ID of the post',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'Post details retrieved successfully',
+                        schema: {
+                            $ref: '#/components/schemas/Post',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    404: {
+                        description: 'Post not found',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            },
+        },
+        '/v1/comment/create/{postId}': {
+            post: {
+                summary: 'Create a new comment',
+                description: 'Creates a new comment for the specified post',
+                tags: ['Comments'],
+                parameters: [
+                    {
+                        in: 'path',
+                        name: 'postId',
+                        description: 'The ID of the post',
+                        required: true,
+                        schema: {
+                            type:'string',
+                            format: 'uuid',
+                        },
+                    },
+                    {
+                        in: 'body',
+                        name: 'comment',
+                        description: 'comment details',
+                        required: true,
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                content: {
+                                    type:'string',
+                                    description: 'The content of the comment',
+                                },
+                            },
+                        },
+                    },
+                ],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                requestBody: {
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    content: {
+                                        type:'string',
+                                        description: 'The content of the comment',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    201: {
+                        description: 'Comment created successfully',
+                        schema: {
+                            $ref: '#/components/schemas/Comment',
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    404: {
+                        description: 'Post not found',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            },
+        },
+        '/v1/comment/get-latest-comments': {
+            get: {
+                summary: 'Get latest comments',
+                description: 'Retrieves the 3 top users with their latest comments for all posts',
+                tags: ['Comments'],
+                security: [
+                    { JWTAuth: [] }
+                ],
+                responses: {
+                    200: {
+                        description: 'Latest comments retrieved successfully',
+                        schema: {
+                            type: 'array',
+                            items: {
+                                $ref: '#/components/schemas/Comment',
+                            },
+                        },
+                    },
+                    401: {
+                        description: 'Unauthorized',
+                    },
+                    500: {
+                        description: 'Internal Server Error',
+                    },
+                },
+            }
+        },
     },
     securityDefinitions: {
         JWTAuth: {

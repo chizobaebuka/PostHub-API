@@ -16,7 +16,5 @@ userRouter.post('/signup', registerUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/', getAllUsers);
 userRouter.get('/:id', getUserById);
-userRouter.post('/:id/posts', authMiddleware, createPost)
-userRouter.get('/:id/posts', authMiddleware, getUserPosts)
 
 export default userRouter;
