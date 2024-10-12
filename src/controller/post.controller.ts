@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import PostModel from '../db/models/postmodel';
 import { AuthRequest } from '../middleware/authMiddleware';
+import UserModel from '../db/models/usermodel';
 
 export const createPost = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -19,6 +20,11 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
             content,
             userId,  // Associate the post with the authenticated user
         });
+
+        await UserModel.update(
+            { postId: post.id },  
+            { where: { id: userId } } 
+        );
 
         // Respond with the newly created post
         res.status(201).json({

@@ -21,7 +21,9 @@
 #### Documentation: Postman Collection and Swagger
 #### Authentication: JWT
 
-Steps: 
+LINK TO POSTMAN DOCUMENTATION: https://nodejstypescriptsequelize.postman.co/workspace/task~e84dface-e333-4a46-8aae-9b7d1e2b9e20/collection/27252824-718a6bd2-3f3f-45f0-ac08-8a9103ec2b14?action=share&creator=27252824
+
+Steps taken in building
 1. npm init -y
 2. npm install --save-dev @types/bcryptjs @types/express @types/jest @types/jsonwebtoken @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint jest nodemon ts-jest ts-node typescript @types/cors @types/compression @types/swagger-jsdoc
 3. npm install bcryptjs dotenv express joi jsonwebtoken pg pg-hstore redis sequelize compression cors swagger-jsdoc swagger-ui-express
@@ -39,3 +41,11 @@ Steps:
     npm i swagger-jsdoc npm i swagger-ui-express  
     npm i --save-dev @types/swagger-ui-express
 
+
+STEPS TO RUN THE PROJECT:
+1. Clone the repo
+2. Set up your env using the naming convention on the .env.sample 
+3. start your server and connect to the server
+4. Navigate to the http://localhost:4020/api-docs to see the documentation on swagger 
+5. Test all apis 
+6. To run the tests using jest - npm run test

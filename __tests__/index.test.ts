@@ -19,7 +19,7 @@ jest.mock('../src/utils/helpers');
 process.env.JWT_SECRET_KEY = 'testsecretkey';
 
 beforeEach(async () => {
-    (UserModel.findByPk as jest.Mock).mockReset();
+    (UserModel.findAll as jest.Mock).mockReset();
     (PostModel.create as jest.Mock).mockReset();
     (CommentModel.create as jest.Mock).mockResolvedValue(mockComment);
     (generateToken as jest.Mock).mockReset();
@@ -27,6 +27,11 @@ beforeEach(async () => {
     // Seed the database with a mock user
     await UserModel.create(mockUserData);
     await PostModel.destroy({ where: {} });
+    
+    // Mock the findAll method to return the mock user
+    (UserModel.findAll as jest.Mock).mockResolvedValue([mockUser]);
+    (PostModel.findByPk as jest.Mock).mockResolvedValue(mockPost);
+    (CommentModel.findOne as jest.Mock).mockResolvedValue(mockLatestComment);
 });
 
 afterAll(async () => {
@@ -44,6 +49,9 @@ const mockUserData = {
     password: 'password123',
 };
 
+// const mockPost = { id: uuidv4(), title: 'First Post', content: 'Content of the first post', userId };
+// const postId = mockPost.id;
+
 const mockUser = {
     ...mockUserData,
     save: jest.fn().mockResolvedValue(mockUserData),
@@ -60,6 +68,19 @@ const mockComment = {
     userId,
     postId,
 };
+
+const mockLatestComment = {
+    content: 'This is a test comment.',
+};
+
+const mockLatestPost = {
+    id: mockPost.id,
+    title: mockPost.title,
+    content: mockPost.content,
+    userId: mockPost.userId,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+}
 
 describe('User Related Routes Test', () => {
     // Test cases for user registration
@@ -203,7 +224,7 @@ describe('User Related Routes Test', () => {
 })
 
 describe('POST RELATED ROUTES', () => {
-    describe(`POST /v1/auth/${userId}/posts`, () => {
+    describe(`POST /v1/post/create/${userId}`, () => {
         it('should create a new post for the authenticated user successfully', async () => {
             const postData = {
                 title: 'New Post',
@@ -222,7 +243,7 @@ describe('POST RELATED ROUTES', () => {
             });
     
             const response = await request(app)
-                .post(`/v1/auth/${mockUser.id}/posts`)
+                .post(`/v1/post/create/${mockUser.id}`)
                 .send(postData)
                 .set('Authorization', `Bearer ${token}`);
     
@@ -239,7 +260,7 @@ describe('POST RELATED ROUTES', () => {
             };
     
             const response = await request(app)
-                .post(`/v1/auth/${mockUser.id}/posts`) // No token provided
+                .post(`/v1/post/create/${userId}`) // No token provided
                 .send(postData);
     
             expect(response.status).toBe(401);
@@ -256,7 +277,7 @@ describe('POST RELATED ROUTES', () => {
             (PostModel.create as jest.Mock).mockRejectedValue(new Error('Database error'));
     
             const response = await request(app)
-                .post(`/v1/auth/${mockUser.id}/posts`)
+                .post(`/v1/post/create/${mockUser.id}`)
                 .send(postData)
                 .set('Authorization', `Bearer ${token}`);
     
@@ -266,7 +287,7 @@ describe('POST RELATED ROUTES', () => {
         });
     });
     
-    describe(`GET /v1/auth/${userId}/posts`, () => {
+    describe(`GET /v1/post/users/${userId}`, () => {
         const mockPosts = [
             { id: uuidv4(), title: 'First Post', content: 'Content of the first post', userId },
             { id: uuidv4(), title: 'Second Post', content: 'Content of the second post', userId }
@@ -276,7 +297,7 @@ describe('POST RELATED ROUTES', () => {
             (PostModel.findAll as jest.Mock).mockResolvedValue(mockPosts);
     
             const response = await request(app)
-                .get(`/v1/auth/${mockUser.id}/posts`)
+                .get(`/v1/post/users/${mockUser.id}/`)
                 .set('Authorization', `Bearer ${token}`);
     
             expect(response.status).toBe(200);
@@ -290,10 +311,10 @@ describe('POST RELATED ROUTES', () => {
             (PostModel.findAll as jest.Mock).mockResolvedValue(null);
     
             const response = await request(app)
-                .get(`/v1/auth/${mockUser.id}/posts`)
+                .get(`/v1/post/users/${mockUser.id}`)
                 .set('Authorization', `Bearer ${token}`);
     
-            expect(response.status).toBe(404); // Now this will pass
+            expect(response.status).toBe(404); 
             expect(response.body).toHaveProperty('message', 'No posts found for this user');
         });
     
@@ -301,7 +322,7 @@ describe('POST RELATED ROUTES', () => {
             (PostModel.findAll as jest.Mock).mockRejectedValue(new Error('Database error'));
     
             const response = await request(app)
-                .get(`/v1/auth/${mockUser.id}/posts`)
+                .get(`/v1/post/users/${mockUser.id}`)
                 .set('Authorization', `Bearer ${token}`);
     
             expect(response.status).toBe(500);
@@ -355,63 +376,33 @@ describe('COMMENT RELATED ROUTES', () => {
 
     describe('GET /v1/comment/get-latest-comments', () => {
         it('should retrieve top users with their latest comments successfully', async () => {
-            // Mock the database response for the latest comments
-            const mockLatestComments = [
-                { id: uuidv4(), content: 'Test comment 1', userId, createdAt: new Date() },
-                { id: uuidv4(), content: 'Test comment 2', userId, createdAt: new Date() },
-            ];
-            (CommentModel.findAll as jest.Mock).mockResolvedValue(mockLatestComments);
-    
-            // Mock the database response for the user data
-            const mockUsers = [
-                { id: userId, firstName: 'John', lastName: 'Doe', country: 'USA', email: 'johndoe@example.com' },
-            ];
-            (UserModel.findAll as jest.Mock).mockResolvedValue(mockUsers);
-    
+        
+            // Mock the database response to return the expected data
+            (UserModel.findAll as jest.Mock).mockResolvedValue([mockUserData]);
+        
             // Perform the request to retrieve top users with latest comments
             const response = await request(app)
                 .get('/v1/comment/get-latest-comments')
                 .set('Authorization', `Bearer ${token}`);
-    
+        
+            // Assertions for the response structure and content
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('status', 'success');
             expect(response.body).toHaveProperty('message', 'Top users with latest comments retrieved successfully');
             expect(response.body).toHaveProperty('data');
-    
-            // Validate the structure of the response
-            expect(response.body.data).toEqual(
-                expect.arrayContaining([
-                    expect.objectContaining({
-                        userId: mockUsers[0].id,
-                        firstName: mockUsers[0].firstName,
-                        lastName: mockUsers[0].lastName,
-                        country: mockUsers[0].country,
-                        email: mockUsers[0].email,
-                        latestComments: expect.arrayContaining([
-                            expect.objectContaining({
-                                content: mockLatestComments[0].content,
-                            }),
-                        ]),
-                    }),
-                ])
-            );
+            expect(response.body.data).toEqual([
+                {
+                    userId: mockUserData.id,
+                    firstName: mockUserData.firstName,
+                    lastName: mockUserData.lastName,
+                    country: mockUserData.country,
+                    email: mockUserData.email,
+                    latestPostTitle: mockLatestPost.title,
+                    latestComment: mockLatestComment.content
+                }
+            ]); // Ensure response matches the mock data
         });
-    
-        it('should return 500 if an error occurs while retrieving top users', async () => {
-            // Mock CommentModel.findAll to throw an error
-            (CommentModel.findAll as jest.Mock).mockRejectedValue(new Error('Database error'));
-    
-            // Perform the request
-            const response = await request(app)
-                .get('/v1/comment/get-latest-comments')
-                .set('Authorization', `Bearer ${token}`);
-    
 
-            expect(response.status).toBe(500);
-            expect(response.body).toHaveProperty('message', 'Error retrieving top users with latest comments');
-            expect(response.body).toHaveProperty('error', 'Database error');
-        });
-    
         it('should return 401 if user is not authenticated', async () => {
             const response = await request(app)
                 .get('/v1/comment/get-latest-comments'); 
@@ -419,6 +410,19 @@ describe('COMMENT RELATED ROUTES', () => {
     
             expect(response.status).toBe(401);
             expect(response.body).toHaveProperty('error', 'Token is required');
+        });
+
+        it('should return 500 if an error occurs during retrieval', async () => {
+            // Mock UserModel.findAll to throw an error
+            (UserModel.findAll as jest.Mock).mockRejectedValue(new Error('Database error'));
+        
+            const response = await request(app)
+                .get('/v1/comment/get-latest-comments')
+                .set('Authorization', `Bearer ${token}`); 
+        
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('message', 'Error retrieving top users with latest comments');
+            expect(response.body).toHaveProperty('error', 'Database error');
         });
     });
 })
