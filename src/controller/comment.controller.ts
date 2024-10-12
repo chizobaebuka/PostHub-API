@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import CommentModel from '../db/models/commentmodel';
 import { AuthRequest } from '../middleware/authMiddleware';
 import UserModel from '../db/models/usermodel';
-import sequelize from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import PostModel from '../db/models/postmodel';
 
 export const createComment = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -40,58 +40,52 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<vo
 
 export const getTopUsersWithLatestComments = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Step 1: Retrieve the latest comments from the database (limit to the most recent 10 comments)
-        const latestComments = await CommentModel.findAll({
-            order: [['createdAt', 'DESC']],
-            limit: 3,
+        // Step 1: Retrieve users with their postId
+        const topUsers = await UserModel.findAll({
+            attributes: ['id', 'firstName', 'lastName', 'country', 'email', 'postId'], // Select necessary attributes including postId
+            where: {
+                postId: { [Op.ne]: null } // Ensure users have a postId associated
+            },
+            order: [['postId', 'DESC']], // Optionally order by postId
+            limit: 10 // Limit to top 3 users
         });
 
-        // Step 2: Group comments by userId
-        const groupedComments = latestComments.reduce((acc, comment) => {
-            const userId = comment.userId.toString();
-            if (!acc[userId]) {
-                acc[userId] = [];
-            }
-            acc[userId].push(comment);
-            return acc;
-        }, {} as { [userId: string]: CommentModel[] });
+        // Step 2: Construct user data and fetch the latest comments based on postId
+        const responseData = await Promise.all(topUsers.map(async (user) => {
+            // Fetch the latest comment for the post associated with the user
+            const post = await PostModel.findByPk(user.postId || undefined);
 
-        // Step 3: Retrieve user information for each user with comments
-        const userIds = Object.keys(groupedComments);
-        const users = await UserModel.findAll({
-            where: { id: userIds },
-            attributes: ['id', 'firstName', 'lastName', 'country', 'email'], // Select only necessary attributes
-        });
+            const latestComment = await CommentModel.findOne({
+                where: { postId: user.postId },
+                order: [['createdAt', 'DESC']],
+            });
 
-        // Step 4: Construct an array of user comments
-        const userComments = users.map((user) => {
-            const latestCommentsForUser = groupedComments[user.id.toString()] || [];
+            console.log({ latestComment: latestComment });
+
             return {
                 userId: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 country: user.country,
                 email: user.email,
-                latestComments: latestCommentsForUser,
-                createdAt: latestCommentsForUser[0]?.createdAt, // Get the createdAt of the latest comment
+                latestPostTitle: post?.title || null, 
+                latestComment: latestComment?.content || null, 
+                postId: user.postId 
             };
-        });
+        }));
 
-        // Step 5: Sort users by the creation date of their latest comment
-        userComments.sort((a, b) => {
-            return (b.createdAt || new Date(0)).getTime() - (a.createdAt || new Date(0)).getTime();
-        });
-
-        // Step 6: Respond with the sorted user comments
+        // Step 3: Send the response
         res.status(200).json({
             status: 'success',
             message: 'Top users with latest comments retrieved successfully',
-            data: userComments,
+            data: responseData,
         });
     } catch (error: any) {
+        console.error('Error occurred:', error);
         res.status(500).json({
             message: 'Error retrieving top users with latest comments',
             error: error.message || error.errors,
         });
+        return;
     }
-}
+};
