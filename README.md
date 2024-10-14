@@ -45,7 +45,7 @@ Steps taken in building
 STEPS TO RUN THE PROJECT:
 1. Clone the repo
 2. Set up your env using the naming convention on the .env.sample 
-3. start your server and connect to the server
+3. start your server and connect to the server - npm run dev
 4. Navigate to the http://localhost:4020/api-docs to see the documentation on swagger 
 5. Test all apis 
 6. To run the tests using jest - npm run test
